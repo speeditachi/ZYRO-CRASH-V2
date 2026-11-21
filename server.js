@@ -46,6 +46,7 @@ async function startBot() {
     });
     activeSock = sock;
     sock.ev.on('creds.update', saveCreds);
+
     sock.ev.on('connection.update', async update => {
       const { connection, lastDisconnect } = update;
       if (connection === 'open') console.log('ZYRO CONNECTED!');
@@ -63,6 +64,50 @@ async function startBot() {
         }
       }
     });
+
+    sock.ev.on('messages.upsert', async ({ messages }) => {
+      for (const msg of messages) {
+        if (!msg.message || msg.key.fromMe) continue;
+        const chat = msg.key.remoteJid;
+        if (!chat) continue;
+
+        const body = msg.message.conversation || msg.message.extendedTextMessage?.text || '';
+        const command = body.trim().toLowerCase();
+
+        const reply = async text => { await sock.sendMessage(chat, { text }); };
+
+        try {
+          if (['.menu', '.start', '.help', '.zyrocomande'].includes(command)) {
+            await reply(
+`ZYRO CRASH V2
+
+COMMANDS:
+.start
+.menu
+.help
+.ping
+.alive
+.uptime
+.owner
+
+POWER - SPEED - STYLE`
+            );
+          } else if (command === '.ping') {
+            await reply('ZYRO PONG!');
+          } else if (command === '.alive') {
+            await reply('ZYRO CRASH V2 IS ONLINE!');
+          } else if (command === '.uptime') {
+            const seconds = Math.floor((Date.now() - startTime) / 1000);
+            await reply(`UPTIME: ${seconds} seconds`);
+          } else if (command === '.owner') {
+            await reply('OWNER CONTACT: wa.me/50944618286');
+          }
+        } catch (error) {
+          console.error('Command error:', error.message);
+        }
+      }
+    });
+
     return sock;
   } catch (error) {
     activeSock = null;
