@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a0505">
+<title>ZYRO CRASH V2 | Workspace</title>
+
+<style>
+:root{
+ --bg:#0a0505;
+ --panel:#160a0a;
+ --panel2:#1d0d0d;
+ --border:#3a1414;
+ --red:#ff3b3b;
+ --darkred:#8b0000;
+ --muted:#9a7a7a;
+ --white:#f5f1f1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+ background:var(--bg);
+ color:var(--white);
+ font-family:Arial,Helvetica,sans-serif;
+ min-height:100vh;
+}
+a{text-decoration:none;color:inherit}
+button,input{font:inherit}
+header{
+ position:sticky;top:0;z-index:20;
+ background:#0c0505;
+ border-bottom:1px solid #3a1414;
+ padding:15px 20px;
+ display:flex;align-items:center;gap:14px;
+}
+.logo{
+ width:48px;height:48px;border-radius:13px;
+ display:flex;align-items:center;justify-content:center;
+ background:linear-gradient(135deg,#8b0000,#ff3b3b);
+ font-weight:900;font-size:22px;color:white;
+}
+.brand h2{font-size:19px}
+.brand p{font-size:13px;color:var(--muted);margin-top:5px}
+.menu-btn{
+ margin-left:auto;background:none;border:0;
+ color:white;font-size:26px;cursor:pointer;
+}
+.overlay{
+ display:none;position:fixed;inset:0;
+ background:#000b;z-index:29;
+}
+.overlay.show{display:block}
+.sidebar{
+ position:fixed;z-index:30;top:0;left:-290px;
+ height:100%;width:275px;background:#130808;
+ border-right:1px solid var(--red);
+ padding:23px 17px;transition:.3s;
+ overflow-y:auto;
+}
+.sidebar.open{left:0}
+.side-top{
+ display:flex;justify-content:space-between;
+ align-items:center;margin-bottom:30px;
+}
+.side-top h2{color:var(--red)}
+.close-btn{
+ border:0;background:none;color:white;
+ font-size:28px;
+}
+.side-label{
+ color:#8a6a6a;font-size:10px;
+ letter-spacing:2px;margin:22px 0 12px;
+}
+.side-link{
+ display:block;width:100%;padding:14px;
+ margin-bottom:9px;border:1px solid var(--border);
+ border-radius:11px;background:var(--panel);
+ color:white;text-align:left;font-size:12px;
+}
+.side-info{
+ padding:14px;background:var(--panel);
+ border:1px solid var(--border);
+ border-radius:12px;color:#aa8888;
+ font-size:12px;line-height:2;
+}
+.container{
+ max-width:600px;margin:auto;
+ padding:25px 17px 45px;
+}
+.breadcrumb{
+ display:flex;justify-content:space-between;
+ align-items:center;gap:10px;margin-bottom:42px;
+ flex-wrap:wrap;
+}
+.crumb{color:var(--muted);font-size:14px}
+.crumb b{color:white}
+.server-pill{
+ border:1px solid #5a1a1a;
+ background:#210c0c;color:var(--red);
+ padding:11px 16px;border-radius:30px;
+ font-size:12px;
+}
+.hero{text-align:center;margin-bottom:35px}
+.tag{
+ display:inline-block;padding:11px 17px;
+ border:1px solid #5a1a1a;
+ background:#220d0d;border-radius:30px;
+ color:var(--red);font-size:12px;
+ letter-spacing:2px;margin-bottom:22px;
+}
+.hero-content{
+ display:flex;align-items:center;
+ text-align:left;gap:20px;
+}
+.hero-image{
+ width:125px;height:125px;flex-shrink:0;
+ border-radius:23px;
+ display:flex;align-items:center;justify-content:center;
+ background:radial-gradient(circle,#8b0000,#1a0404);
+ border:3px solid #ff3b3b;
+ box-shadow:0 0 25px #ff3b3b55;
+ font-size:46px;font-weight:900;color:#fff;
+}
+.hero-text h1{
+ font-size:29px;letter-spacing:-1px;
+ margin-bottom:18px;
+}
+.hero-text h1 span{color:#8a6a6a}
+.subtitle{
+ color:#b59a9a;font-size:14px;
+ line-height:1.8;
+}
+.tags{
+ display:flex;gap:9px;flex-wrap:wrap;
+ margin-top:20px;
+}
+.tags span{
+ padding:10px 12px;background:#1a0d0d;
+ border:1px solid #3a1414;
+ border-radius:10px;color:#c0a0a0;
+ font-size:11px;
+}
+.divider{
+ border:0;border-top:1px solid #3a1414;
+ margin:35px 0;
+}
+.stats{
+ display:grid;grid-template-columns:1fr 1fr;
+ background:var(--panel);
+ border:1px solid var(--border);
+ border-radius:17px;overflow:hidden;
+ margin-bottom:35px;
+}
+.stat{padding:24px 20px}
+.stat+ .stat{border-left:1px solid var(--border)}
+.stat p{color:var(--muted);font-size:12px}
+.stat h2{font-size:30px;margin-top:15px}
+.stat h2.red{color:var(--red)}
+.card{
+ background:var(--panel);
+ border:1px solid var(--border);
+ border-radius:17px;padding:23px;
+ margin-bottom:30px;
+}
+.card h2{font-size:20px;margin-bottom:13px}
+.description{
+ color:#b59a9a;font-size:13px;
+ line-height:1.8;margin-bottom:25px;
+}
+input{
+ width:100%;padding:19px 16px;
+ background:#1a0d0d;border:1px solid #3a1414;
+ border-radius:13px;color:white;
+ outline:none;font-size:15px;
+ margin-bottom:16px;
+}
+input:focus{border-color:var(--red)}
+input::placeholder{color:#8a6a6a}
+.main-btn{
+ width:100%;max-width:260px;
+ padding:19px 15px;border:0;
+ border-radius:13px;
+ background:linear-gradient(110deg,#ff3b3b,#8b0000);
+ color:white;font-weight:bold;
+ font-size:15px;cursor:pointer;
+ box-shadow:0 10px 25px #ff3b3b33;
+}
+.main-btn:disabled{opacity:.5}
+#result-box{
+ display:none;margin-top:22px;
+ padding:20px 14px;text-align:center;
+ background:#1f0a0a;border:1px solid var(--red);
+ border-radius:14px;
+}
+.success-title{
+ color:var(--red);font-size:13px;
+ font-weight:bold;margin-bottom:15px;
+}
+.code-label{
+ color:#c79999;font-size:11px;
+ letter-spacing:2px;margin-top:15px;
+}
+#pairing-code{
+ color:var(--red);font-size:27px;
+ font-weight:900;letter-spacing:4px;
+ padding:17px 7px;margin:13px 0;
+ background:#120707;border:1px dashed var(--red);
+ border-radius:10px;overflow-wrap:anywhere;
+}
+.result-actions{
+ display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
+.copy-btn,.download-btn{
+ padding:14px 5px;border-radius:10px;
+ font-size:11px;font-weight:bold;
+}
+.copy-btn{
+ background:var(--darkred);color:white;border:0;
+}
+.download-btn{
+ background:#1a0d0d;color:white;
+ border:1px solid var(--border);
+}
+#copy-message{
+ color:var(--red);font-size:12px;margin-top:13px;
+}
+#qr-container{
+ display:none;width:max-content;max-width:100%;
+ padding:12px;background:white;
+ border-radius:12px;margin:auto;
+}
+#qrcode{min-width:190px;min-height:190px}
+#qr-container p{color:#111;font-size:11px;margin-top:8px}
+.section-label{
+ color:#9a7a7a;font-size:12px;
+ letter-spacing:2px;margin:35px 0 17px;
+}
+.community{
+ display:flex;align-items:center;gap:16px;
+ background:var(--panel);
+ border:1px solid var(--border);
+ border-radius:15px;padding:17px;
+ margin-bottom:15px;
+}
+.community-icon{
+ width:52px;height:52px;flex-shrink:0;
+ display:grid;place-items:center;
+ border-radius:13px;background:#2a1010;
+ color:var(--red);font-size:24px;
+}
+.community-text{flex:1}
+.community-text h3{font-size:15px;margin-bottom:7px}
+.community-text p{font-size:12px;color:var(--muted)}
+.arrow{
+ border:1px solid var(--border);
+ padding:12px;border-radius:11px;
+ color:#c0a0a0;
+}
+.step{
+ display:flex;gap:15px;
+ padding:16px 0;border-bottom:1px solid var(--border);
+}
+.step:last-child{border:0}
+.step-number{color:var(--red);font-size:20px;font-weight:bold}
+.step h3{font-size:13px;margin-bottom:7px}
+.step p{font-size:12px;color:var(--muted);line-height:1.7}
+.status-row{
+ display:flex;justify-content:space-between;
+ padding:15px 0;border-bottom:1px solid var(--border);
+ font-size:13px;
+}
+.status-row:last-child{border:0}
+.status-name{color:var(--muted)}
+.status-value{color:var(--red);font-weight:bold}
+.pending{color:#ffbd4a}
+.share-btn{
+ width:100%;padding:15px;
+ background:#1a0d0d;border:1px solid var(--border);
+ border-radius:12px;color:white;
+ font-weight:bold;cursor:pointer;
+}
+footer{
+ text-align:center;padding:35px 15px;
+ border-top:1px solid var(--border);
+ color:var(--muted);font-size:12px;
+}
+.footer-brand{
+ color:var(--red);font-size:19px;
+ font-weight:900;letter-spacing:2px;
+ margin-bottom:12px;
+}
+.owner-btn{
+ display:inline-block;margin-top:17px;
+ background:linear-gradient(110deg,#ff3b3b,#8b0000);
+ color:white;padding:13px 24px;
+ border-radius:30px;font-weight:bold;
+}
+@media(max-width:430px){
+ .hero-content{gap:14px}
+ .hero-image{width:105px;height:105px;font-size:36px}
+ .hero-text h1{font-size:24px}
+ .subtitle{font-size:12px}
+ .tags span{font-size:10px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+ <div class="logo">Z</div>
+ <div class="brand">
+  <h2>ZYRO</h2>
+  <p>Workspace &middot; v2.0.0</p>
+ </div>
+ <button class="menu-btn" id="menuBtn">&#9776;</button>
+</header>
+
+<div class="overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+ <div class="side-top">
+  <h2>ZYRO</h2>
+  <button class="close-btn" id="closeBtn">&times;</button>
+ </div>
+
+ <div class="side-label">NAVIGATION</div>
+ <a href="#home" class="side-link">HOME</a>
+ <a href="#connect" class="side-link">WHATSAPP PAIRING</a>
+ <a href="#how" class="side-link">HOW IT WORKS</a>
+ <a href="#status" class="side-link">SYSTEM STATUS</a>
+
+ <div class="side-label">INFORMATION</div>
+ <div class="side-info">
+  PLATFORM<br><b>ZYRO CRASH V2</b><br>
+  VERSION<br><b>2.0.0</b><br>
+  STATUS<br><b style="color:#ff3b3b">ONLINE</b>
+ </div>
+
+ <div class="side-label">CONTACT & SHARE</div>
+ <a href="https://wa.me/50944618286"
+ target="_blank" class="side-link">CONTACT OWNER</a>
+ <button class="side-link" id="sideShare">SHARE WEBSITE</button>
+</aside>
+
+<main class="container" id="home">
+
+ <div class="breadcrumb">
+  <div class="crumb">Workspace / <b>Pairing</b></div>
+  <div class="server-pill">SYSTEM ONLINE</div>
+ </div>
+
+ <section class="hero">
+  <div class="tag">MULTI-DEVICE PAIRING</div>
+
+  <div class="hero-content">
+   <div class="hero-image">Z</div>
+
+   <div class="hero-text">
+    <h1>ZYRO <span>V2</span></h1>
+    <p class="subtitle">
+     Multi-device WhatsApp bot built with Baileys.
+     Enter your number below and get a pairing code.
+    </p>
+    <div class="tags">
+     <span>Node.js &middot; Baileys</span>
+     <span>Multi-session</span>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <hr class="divider">
+
+ <section class="stats">
+  <div class="stat">
+   <p>Platform</p>
+   <h2>V2.0</h2>
+  </div>
+  <div class="stat">
+   <p>System status</p>
+   <h2 class="red">ONLINE</h2>
+  </div>
+ </section>
+
+ <section class="card" id="connect">
+  <h2>Link a WhatsApp number</h2>
+  <p class="description">
+   Enter a number with its country code, digits only.
+   The bot backend generates your pairing code.
+  </p>
+
+  <form id="connect-form">
+   <input type="tel" id="phone-full"
+    placeholder="+509XXXXXXXX" required>
+
+   <button type="submit" class="main-btn" id="submit-btn">
+    Get pairing code &rarr;
+   </button>
+  </form>
+
+  <div id="result-box">
+   <div class="success-title">CONNECTION RESPONSE RECEIVED</div>
+
+   <div id="qr-container">
+    <div id="qrcode"></div>
+    <p>SCAN WITH WHATSAPP</p>
+   </div>
+
+   <div class="code-label">YOUR PAIRING CODE</div>
+   <div id="pairing-code">--------</div>
+
+   <div class="result-actions">
+    <button type="button" class="copy-btn" id="copy-btn">
+     COPY CODE
+    </button>
+    <button type="button" class="download-btn" id="download-qr">
+     DOWNLOAD QR
+    </button>
+   </div>
+   <p id="copy-message"></p>
+  </div>
+ </section>
+
+ <div class="section-label">COMMUNITY</div>
+
+ <a href="https://wa.me/50944618286"
+ target="_blank" class="community">
+  <div class="community-icon">C</div>
+  <div class="community-text">
+   <h3>Contact Owner</h3>
+   <p>Support &amp; assistance</p>
+  </div>
+  <div class="arrow">&rarr;</div>
+ </a>
+
+ <section class="card" id="how">
+  <h2>How it works</h2>
+  <p class="description">Three simple steps to connect.</p>
+
+  <div class="step">
+   <div class="step-number">01</div>
+   <div>
+    <h3>ENTER YOUR NUMBER</h3>
+    <p>Enter your country code and phone number.</p>
+   </div>
+  </div>
+
+  <div class="step">
+   <div class="step-number">02</div>
+   <div>
+    <h3>GENERATE CODE</h3>
+    <p>Request your pairing code from the server.</p>
+   </div>
+  </div>
+
+  <div class="step">
+   <div class="step-number">03</div>
+   <div>
+    <h3>CONNECT WHATSAPP</h3>
+    <p>Follow WhatsApp linked-device instructions.</p>
+   </div>
+  </div>
+ </section>
+
+ <section class="card" id="status">
+  <h2>System status</h2>
+
+  <div class="status-row">
+   <span class="status-name">WEBSITE</span>
+   <span class="status-value">ONLINE</span>
+  </div>
+
+  <div class="status-row">
+   <span class="status-name">BACKEND</span>
+   <span class="status-value" id="backend-status">CHECKING</span>
+  </div>
+
+  <div class="status-row">
+   <span class="status-name">WHATSAPP</span>
+   <span class="status-value pending" id="ws-status">NOT CONNECTED</span>
+  </div>
+
+  <div class="status-row">
+   <span class="status-name">VERSION</span>
+   <span class="status-value">2.0.0</span>
+  </div>
+ </section>
+
+ <button class="share-btn" id="shareBtn">
+  SHARE ZYRO WEBSITE
+ </button>
+
+</main>
+
+<footer>
+ <div class="footer-brand">ZYRO CRASH V2</div>
+ <a href="https://wa.me/50944618286"
+ target="_blank" class="owner-btn">CONTACT OWNER</a>
+ <p style="margin-top:20px">&copy; 2026 ZYRO. All rights reserved.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+const BACKEND_URL="https://zyro-backend.onrender.com/connect";
+const API_KEY="ZyroSecret2026XYZ";
+
+const sidebar=document.getElementById("sidebar");
+const overlay=document.getElementById("overlay");
+
+function closeMenu(){
+ sidebar.classList.remove("open");
+ overlay.classList.remove("show");
+}
+
+document.getElementById("menuBtn").onclick=function(){
+ sidebar.classList.add("open");
+ overlay.classList.add("show");
+};
+
+document.getElementById("closeBtn").onclick=closeMenu;
+overlay.onclick=closeMenu;
+
+document.querySelectorAll(".side-link[href^='#']")
+.forEach(function(a){a.addEventListener("click",closeMenu);});
+
+async function shareWebsite(){
+ const data={
+  title:"ZYRO CRASH V2",
+  text:"Check out ZYRO CRASH V2!",
+  url:location.href
+ };
+ try{
+  if(navigator.share){
+   await navigator.share(data);
+  }else{
+   await navigator.clipboard.writeText(location.href);
+   alert("Website link copied!");
+  }
+ }catch(e){
+  if(e.name!=="AbortError"){
+   alert("Unable to share website.");
+  }
+ }
+}
+
+document.getElementById("shareBtn").onclick=shareWebsite;
+document.getElementById("sideShare").onclick=function(){
+ closeMenu();
+ shareWebsite();
+};
+
+const form=document.getElementById("connect-form");
+const submitBtn=document.getElementById("submit-btn");
+const resultBox=document.getElementById("result-box");
+const pairingCode=document.getElementById("pairing-code");
+const qrContainer=document.getElementById("qr-container");
+const qrElement=document.getElementById("qrcode");
+const copyMessage=document.getElementById("copy-message");
+
+form.addEventListener("submit",async function(e){
+ e.preventDefault();
+
+ const phone=document.getElementById("phone-full")
+ .value.replace(/\D/g,"").replace(/^0+/,"");
+
+ if(!phone || phone.length<8){
+  alert("Enter a valid phone number with country code.");
+  return;
+ }
+
+ submitBtn.disabled=true;
+ submitBtn.textContent="REQUESTING CODE...";
+
+ resultBox.style.display="block";
+ pairingCode.textContent="LOADING...";
+ qrContainer.style.display="none";
+ qrElement.innerHTML="";
+ copyMessage.textContent="";
+
+ try{
+  const response=await fetch(BACKEND_URL,{
+   method:"POST",
+   headers:{"Content-Type":"application/json","x-api-key":API_KEY},
+   body:JSON.stringify({phone:phone})
+  });
+
+  const data=await response.json();
+
+  if(!response.ok || !data.success || !data.code){
+   throw new Error(data.error||data.message||"Unable to generate code.");
+  }
+
+  pairingCode.textContent=data.code;
+
+  document.getElementById("ws-status").textContent="CODE GENERATED";
+  document.getElementById("ws-status").className="status-value";
+  document.getElementById("backend-status").textContent="ONLINE";
+
+  if(data.qr && window.QRCode){
+   new QRCode(qrElement,{
+    text:data.qr,
+    width:190,
+    height:190,
+    colorDark:"#000000",
+    colorLight:"#ffffff",
+    correctLevel:QRCode.CorrectLevel.M
+   });
+   qrContainer.style.display="block";
+  }
+
+ }catch(error){
+  console.error(error);
+  resultBox.style.display="none";
+
+  document.getElementById("ws-status").textContent="NOT CONNECTED";
+  document.getElementById("ws-status").className="status-value pending";
+  document.getElementById("backend-status").textContent="CHECK CONNECTION";
+
+  alert(error.message||"Backend connection failed.");
+
+ }finally{
+  submitBtn.disabled=false;
+  submitBtn.textContent="Get pairing code \u2192";
+ }
+});
+
+document.getElementById("copy-btn").onclick=async function(){
+ const code=pairingCode.textContent;
+ if(!code || code==="LOADING...")return;
+ try{
+  await navigator.clipboard.writeText(code);
+  copyMessage.textContent="CODE COPIED SUCCESSFULLY!";
+ }catch(e){
+  copyMessage.textContent="Please copy the code manually.";
+ }
+};
+
+document.getElementById("download-qr").onclick=function(){
+ const canvas=qrElement.querySelector("canvas");
+ const img=qrElement.querySelector("img");
+ const src=canvas?canvas.toDataURL("image/png"):img?img.src:null;
+ if(!src){
+  alert("No QR code was provided by the server.");
+  return;
+ }
+ const link=document.createElement("a");
+ link.href=src;
+ link.download="ZYRO-QR.png";
+ link.click();
+};
+</script>
+
+</body>
+</html>
